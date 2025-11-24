@@ -8,6 +8,12 @@ import { css, Global } from '@emotion/react';
 import { CodeTransformer } from './utils/codeTransformer';
 import { Language, getTranslation } from './i18n/translations';
 import { Theme, darkTheme, lightTheme } from './theme/theme';
+import { useDeobfuscationHandlers } from './hooks/useDeobfuscationHandlers';
+import { useObfuscationHandlers } from './hooks/useObfuscationHandlers';
+import { useUtilityHandlers } from './hooks/useUtilityHandlers';
+import { SecurityScanner, SecurityScanResult } from './utils/securityScanner';
+import { SecurityPanel } from './components/SecurityPanel';
+import { CodeEditor } from './components/CodeEditor';
 
 const EXAMPLE_CODE = `eval(function(p,a,c,k,e,r){e=String;if(!''.replace(/^/,String)){while(c--)r[c]=k[c]||c;k=[function(e){return r[e]}];e=function(){return'\\\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('0.1("2 3!");',4,4,'console|log|Hello|World'.split('|'),0,{}))`;
 
@@ -27,6 +33,11 @@ function App() {
   const [copied, setCopied] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [originalCode, setOriginalCode] = useState('');
+  const [splitMode, setSplitMode] = useState(false);
+  const [inputCode, setInputCode] = useState('');
+  const [outputCode, setOutputCode] = useState('');
+  const [useMonacoEditor, setUseMonacoEditor] = useState(false);
+  const [securityResult, setSecurityResult] = useState<SecurityScanResult | null>(null);
 
   const t = getTranslation(language);
 
@@ -35,16 +46,21 @@ function App() {
   }, []);
 
   const handleDecode = useCallback(() => {
-    if (!code.trim()) {
+    const sourceCode = splitMode ? inputCode : code;
+    if (!sourceCode.trim()) {
       return;
     }
     try {
-      const result = CodeTransformer.smartDecode(code);
-      setCode(result);
+      const result = CodeTransformer.smartDecode(sourceCode);
+      if (splitMode) {
+        setOutputCode(result);
+      } else {
+        setCode(result);
+      }
     } catch (error) {
       alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
-  }, [code, t.errorPrefix]);
+  }, [code, inputCode, splitMode, t.errorPrefix]);
 
   const handleClear = useCallback(() => {
     setCode('');
@@ -56,46 +72,35 @@ function App() {
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(code);
+      const textToCopy = splitMode ? outputCode : code;
+      await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
-  }, [code]);
+  }, [code, outputCode, splitMode]);
 
   const handlePaste = useCallback(async () => {
     try {
       const text = await navigator.clipboard.readText();
-      setCode(text);
+      if (splitMode) {
+        setInputCode(text);
+      } else {
+        setCode(text);
+      }
     } catch (err) {
       console.error('Failed to paste:', err);
     }
-  }, []);
-
-  const handleBeautify = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.beautify(code);
-      setCode(result);
-    } catch (err) {
-      console.error('Failed to beautify:', err);
-    }
-  }, [code]);
-
-  const handleMinify = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.minify(code);
-      setCode(result);
-    } catch (err) {
-      console.error('Failed to minify:', err);
-    }
-  }, [code]);
+  }, [splitMode]);
 
   const handleDownload = useCallback(() => {
-    if (!code.trim()) return;
-    const blob = new Blob([code], { type: 'text/javascript' });
+    const sourceCode = splitMode ? (outputCode || inputCode) : code;
+    if (!sourceCode.trim()) {
+      alert('No code to download');
+      return;
+    }
+    const blob = new Blob([sourceCode], { type: 'text/javascript' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -104,39 +109,25 @@ function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [code]);
+  }, [code, outputCode, inputCode, splitMode]);
 
   const handleAutoDecodeAll = useCallback(() => {
-    if (!code.trim()) return;
+    const sourceCode = splitMode ? inputCode : code;
+    if (!sourceCode.trim()) return;
     try {
-      setOriginalCode(code);
-      const result = CodeTransformer.autoDecodeAll(code);
-      setCode(result);
-      setCompareMode(true);
+      if (splitMode) {
+        const result = CodeTransformer.autoDecodeAll(sourceCode);
+        setOutputCode(result);
+      } else {
+        setOriginalCode(sourceCode);
+        const result = CodeTransformer.autoDecodeAll(sourceCode);
+        setCode(result);
+        setCompareMode(true);
+      }
     } catch (error) {
       alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
-  }, [code, t.errorPrefix]);
-
-  const handleRenameVars = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.renameVariables(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleDecodeStrings = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeStrings(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
+  }, [code, inputCode, splitMode, t.errorPrefix]);
 
   const toggleCompare = useCallback(() => {
     if (!compareMode && !originalCode) {
@@ -145,181 +136,54 @@ function App() {
     setCompareMode(!compareMode);
   }, [compareMode, originalCode, code]);
 
-  // Deobfuscation handlers
-  const handleSmartDecode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.smartDecode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+  const toggleSplit = useCallback(() => {
+    if (!splitMode) {
+      setInputCode(code);
+      setOutputCode('');
+      setCompareMode(false);
+    } else {
+      setCode(outputCode || inputCode);
     }
-  }, [code, t.errorPrefix]);
+    setSplitMode(!splitMode);
+  }, [splitMode, code, inputCode, outputCode]);
 
-  const handleDecodeJSFuck = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeJSFuck(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
+  // Use custom hooks for handlers
+  const deobfuscationHandlers = useDeobfuscationHandlers({
+    code,
+    inputCode,
+    splitMode,
+    setCode,
+    setOutputCode,
+    t,
+  });
 
-  const handleDecodeAAEncode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeAAEncode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
+  const obfuscationHandlers = useObfuscationHandlers({
+    code,
+    inputCode,
+    splitMode,
+    setCode,
+    setOutputCode,
+    t,
+  });
 
-  const handleDecodeJJEncode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeJJEncode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
+  const utilityHandlers = useUtilityHandlers({
+    code,
+    inputCode,
+    splitMode,
+    setCode,
+    setOutputCode,
+    t,
+  });
 
-  const handleDecodeURL = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeURL(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+  const handleSecurityScan = useCallback(() => {
+    const sourceCode = splitMode ? (inputCode || outputCode) : code;
+    if (!sourceCode.trim()) {
+      alert('No code to scan');
+      return;
     }
-  }, [code, t.errorPrefix]);
-
-  const handleDecodeBase64 = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeBase64(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleDecodeHex = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeHex(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleDecodeUnicode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.decodeUnicode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleUnpackArray = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.unpackArrayObfuscation(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  // Obfuscation handlers
-  const handleEncodeAAEncode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeAAEncode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleEncodeJJEncode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeJJEncode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleEncodeHex = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeHex(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleEncodeUnicode = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeUnicode(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleEncodeURL = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeURL(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleEncodeBase64 = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeBase64(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleObfuscateAdvanced = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.obfuscateAdvanced(code, {
-        stringEncoding: 'hex',
-        controlFlow: true,
-        deadCode: true
-      });
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
-
-  const handleEncodeMurrCoder = useCallback(() => {
-    if (!code.trim()) return;
-    try {
-      const result = CodeTransformer.encodeMurrCoderExtreme(code);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, t.errorPrefix]);
+    const result = SecurityScanner.scanCode(sourceCode);
+    setSecurityResult(result);
+  }, [code, inputCode, outputCode, splitMode]);
 
   const handleRun = useCallback(() => {
     if (!code.trim()) return;
@@ -647,6 +511,9 @@ function App() {
           <button css={secondaryButtonStyle} onClick={toggleCompare}>
             {t.compareMode}
           </button>
+          <button css={secondaryButtonStyle} onClick={toggleSplit}>
+            {t.splitMode}
+          </button>
           <button css={secondaryButtonStyle} onClick={handlePaste}>
             {t.paste}
           </button>
@@ -658,35 +525,108 @@ function App() {
           </button>
         </div>
 
-        {compareMode ? (
+        {splitMode ? (
+          <div css={css`display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;`}>
+            <div css={textareaContainerStyle}>
+              <div css={css`font-weight: 600; margin-bottom: 0.5rem; color: ${theme.text};`}>{t.input}</div>
+              {useMonacoEditor ? (
+                <CodeEditor
+                  value={inputCode}
+                  onChange={setInputCode}
+                  theme={theme}
+                  placeholder={t.inputPlaceholder}
+                  height="500px"
+                />
+              ) : (
+                <textarea
+                  css={textareaStyle}
+                  value={inputCode}
+                  onChange={(e) => setInputCode(e.target.value)}
+                  placeholder={t.inputPlaceholder}
+                />
+              )}
+            </div>
+            <div css={textareaContainerStyle}>
+              <div css={css`font-weight: 600; margin-bottom: 0.5rem; color: ${theme.text};`}>{t.output}</div>
+              {useMonacoEditor ? (
+                <CodeEditor
+                  value={outputCode}
+                  onChange={() => {}}
+                  theme={theme}
+                  readOnly
+                  placeholder={t.outputPlaceholder}
+                  height="500px"
+                />
+              ) : (
+                <textarea
+                  css={textareaStyle}
+                  value={outputCode}
+                  readOnly
+                  placeholder={t.outputPlaceholder}
+                />
+              )}
+            </div>
+          </div>
+        ) : compareMode ? (
           <div css={css`display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;`}>
             <div css={textareaContainerStyle}>
               <div css={css`font-weight: 600; margin-bottom: 0.5rem; color: ${theme.text};`}>Original</div>
-              <textarea
-                css={textareaStyle}
-                value={originalCode}
-                readOnly
-                placeholder={t.inputPlaceholder}
-              />
+              {useMonacoEditor ? (
+                <CodeEditor
+                  value={originalCode}
+                  onChange={() => {}}
+                  theme={theme}
+                  readOnly
+                  placeholder={t.inputPlaceholder}
+                  height="500px"
+                />
+              ) : (
+                <textarea
+                  css={textareaStyle}
+                  value={originalCode}
+                  readOnly
+                  placeholder={t.inputPlaceholder}
+                />
+              )}
             </div>
             <div css={textareaContainerStyle}>
               <div css={css`font-weight: 600; margin-bottom: 0.5rem; color: ${theme.text};`}>Decoded</div>
-              <textarea
-                css={textareaStyle}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder={t.outputPlaceholder}
-              />
+              {useMonacoEditor ? (
+                <CodeEditor
+                  value={code}
+                  onChange={setCode}
+                  theme={theme}
+                  placeholder={t.outputPlaceholder}
+                  height="500px"
+                />
+              ) : (
+                <textarea
+                  css={textareaStyle}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder={t.outputPlaceholder}
+                />
+              )}
             </div>
           </div>
         ) : (
           <div css={textareaContainerStyle}>
-            <textarea
-              css={textareaStyle}
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder={t.inputPlaceholder}
-            />
+            {useMonacoEditor ? (
+              <CodeEditor
+                value={code}
+                onChange={setCode}
+                theme={theme}
+                placeholder={t.inputPlaceholder}
+                height="500px"
+              />
+            ) : (
+              <textarea
+                css={textareaStyle}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder={t.inputPlaceholder}
+              />
+            )}
           </div>
         )}
 
@@ -711,31 +651,31 @@ function App() {
             </button>
             {showDeobfuscateDropdown && (
               <div css={dropdownMenuStyle}>
-                <div css={dropdownItemStyle} onClick={() => { handleSmartDecode(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleSmartDecode(); setShowDeobfuscateDropdown(false); }}>
                   {t.smartDecode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeJSFuck(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeJSFuck(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeJSFuck}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeAAEncode(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeAAEncode(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeAAEncode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeJJEncode(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeJJEncode(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeJJEncode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeURL(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeURL(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeURL}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeBase64(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeBase64(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeBase64}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeHex(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeHex(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeHex}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleDecodeUnicode(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleDecodeUnicode(); setShowDeobfuscateDropdown(false); }}>
                   {t.decodeUnicode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleUnpackArray(); setShowDeobfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { deobfuscationHandlers.handleUnpackArray(); setShowDeobfuscateDropdown(false); }}>
                   {t.unpackArray}
                 </div>
               </div>
@@ -755,45 +695,48 @@ function App() {
             </button>
             {showObfuscateDropdown && (
               <div css={dropdownMenuStyle}>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeMurrCoder(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeMurrCoder(); setShowObfuscateDropdown(false); }}>
                   {t.encodeMurrCoder}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleObfuscateAdvanced(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleObfuscateAdvanced(); setShowObfuscateDropdown(false); }}>
                   {t.obfuscateAdvanced}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeAAEncode(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeAAEncode(); setShowObfuscateDropdown(false); }}>
                   {t.encodeAAEncode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeJJEncode(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeJJEncode(); setShowObfuscateDropdown(false); }}>
                   {t.encodeJJEncode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeHex(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeHex(); setShowObfuscateDropdown(false); }}>
                   {t.encodeHex}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeUnicode(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeUnicode(); setShowObfuscateDropdown(false); }}>
                   {t.encodeUnicode}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeURL(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeURL(); setShowObfuscateDropdown(false); }}>
                   {t.encodeURL}
                 </div>
-                <div css={dropdownItemStyle} onClick={() => { handleEncodeBase64(); setShowObfuscateDropdown(false); }}>
+                <div css={dropdownItemStyle} onClick={() => { obfuscationHandlers.handleEncodeBase64(); setShowObfuscateDropdown(false); }}>
                   {t.encodeBase64}
                 </div>
               </div>
             )}
           </div>
 
-          <button css={secondaryButtonStyle} onClick={handleBeautify}>
+          <button css={secondaryButtonStyle} onClick={utilityHandlers.handleBeautify}>
             {t.beautify}
           </button>
-          <button css={secondaryButtonStyle} onClick={handleMinify}>
+          <button css={secondaryButtonStyle} onClick={utilityHandlers.handleMinify}>
             {t.minify}
           </button>
-          <button css={secondaryButtonStyle} onClick={handleRenameVars}>
+          <button css={secondaryButtonStyle} onClick={utilityHandlers.handleRenameVars}>
             {t.renameVars}
           </button>
-          <button css={secondaryButtonStyle} onClick={handleDecodeStrings}>
+          <button css={secondaryButtonStyle} onClick={utilityHandlers.handleDecodeStrings}>
             {t.decodeStrings}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handleSecurityScan}>
+            {t.securityScan}
           </button>
           <button css={secondaryButtonStyle} onClick={handleClear}>
             {t.clear}
@@ -804,6 +747,15 @@ function App() {
           <button css={secondaryButtonStyle} onClick={handleLoadExample}>
             {t.loadExample}
           </button>
+          <label css={css`display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: ${theme.text};`}>
+            <input
+              type="checkbox"
+              checked={useMonacoEditor}
+              onChange={(e) => setUseMonacoEditor(e.target.checked)}
+              css={css`cursor: pointer;`}
+            />
+            {t.useMonaco}
+          </label>
           {code.includes('eval(') && (
             <div css={checkboxContainerStyle}>
               <span>{t.layersDetected}: {CodeTransformer.detectEvalLayers(code)}</span>
@@ -811,6 +763,14 @@ function App() {
           )}
         </div>
       </main>
+
+      {securityResult && (
+        <SecurityPanel
+          result={securityResult}
+          theme={theme}
+          onClose={() => setSecurityResult(null)}
+        />
+      )}
 
       <footer css={footerStyle}>
         <p>

@@ -23,6 +23,9 @@ export interface Translations {
   layersDetected: string;
   autoDecodeAll: string;
   compareMode: string;
+  splitMode: string;
+  input: string;
+  output: string;
   renameVars: string;
   decodeStrings: string;
   customTemplate: string;
@@ -47,6 +50,9 @@ export interface Translations {
   obfuscation: string;
   run: string;
   encodeMurrCoder: string;
+  // Security
+  securityScan: string;
+  useMonaco: string;
   // Disclaimer
   disclaimer: string;
 }
@@ -75,6 +81,9 @@ export const translations: Record<Language, Translations> = {
     layersDetected: 'Layers',
     autoDecodeAll: 'Auto-Decode All',
     compareMode: 'Compare',
+    splitMode: 'Split View',
+    input: 'Input',
+    output: 'Output',
     renameVars: 'Rename Vars',
     decodeStrings: 'Decode Strings',
     customTemplate: 'Custom Template',
@@ -99,6 +108,9 @@ export const translations: Record<Language, Translations> = {
     obfuscation: 'Obfuscation',
     run: 'Run',
     encodeMurrCoder: 'MurrCoder (Extreme)',
+    // Security
+    securityScan: '🔒 Security Scan',
+    useMonaco: 'Use Advanced Editor',
     // Disclaimer
     disclaimer: 'Note: This tool may not decrypt some multi-layered encodings and MurrCoder methods. Always verify code functionality before use.',
   },
@@ -125,6 +137,9 @@ export const translations: Record<Language, Translations> = {
     layersDetected: 'Слоёв',
     autoDecodeAll: 'Авто-декодировать всё',
     compareMode: 'Сравнить',
+    splitMode: 'Разделить',
+    input: 'Ввод',
+    output: 'Вывод',
     renameVars: 'Переименовать',
     decodeStrings: 'Декодировать строки',
     customTemplate: 'Свой шаблон',
@@ -150,8 +165,11 @@ export const translations: Record<Language, Translations> = {
     obfuscation: 'Обфускация',
     run: 'Выполнить',
     encodeMurrCoder: 'MurrCoder (Экстремальный)',
+    // Security
+    securityScan: '🔒 Проверка безопасности',
+    useMonaco: 'Расширенный редактор',
     // Disclaimer
-    disclaimer: 'Примечание: Данная утилита может не расшифровать некоторые многослойные кодирования и MurrCoder методы. Всегда проверяйте работоспособность кода перед использованием.',
+    disclaimer: 'Примечание: Этот инструмент может не расшифровать некоторые многослойные кодировки и методы MurrCoder. Всегда проверяйте функциональность кода перед использованием.',
   },
   de: {
     title: 'JS Code Deobfuscator / Obfuscator',
@@ -176,6 +194,9 @@ export const translations: Record<Language, Translations> = {
     layersDetected: 'Ebenen',
     autoDecodeAll: 'Auto-Dekodieren',
     compareMode: 'Vergleichen',
+    splitMode: 'Geteilte Ansicht',
+    input: 'Eingabe',
+    output: 'Ausgabe',
     renameVars: 'Vars umbenennen',
     decodeStrings: 'Strings dekodieren',
     customTemplate: 'Eigene Vorlage',
@@ -200,8 +221,11 @@ export const translations: Record<Language, Translations> = {
     obfuscation: 'Verschleierung',
     run: 'Ausführen',
     encodeMurrCoder: 'MurrCoder (Extrem)',
+    // Security
+    securityScan: '🔒 Sicherheitsüberprüfung',
+    useMonaco: 'Erweiterter Editor',
     // Disclaimer
-    disclaimer: 'Hinweis: Dieses Tool kann einige mehrschichtige Kodierungen und MurrCoder-Methoden möglicherweise nicht entschlüsseln. Überprüfen Sie immer die Funktionalität des Codes vor der Verwendung.',
+    disclaimer: 'Hinweis: Dieses Tool kann einige mehrschichtige Codierungen und MurrCoder-Methoden möglicherweise nicht entschlüsseln. Überprüfen Sie immer die Funktionalität des Codes vor der Verwendung.',
   },
 };
 
