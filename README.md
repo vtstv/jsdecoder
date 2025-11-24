@@ -1,10 +1,17 @@
-# JavaScript Code Decoder
+# JS Code Deobfuscator / Obfuscator
 
-A modern React TypeScript application for decoding JavaScript eval-packed code.
+A modern React TypeScript application for deobfuscating and obfuscating JavaScript code.
 
 ## Features
 
-- **Decode** eval-packed JavaScript code
+- **Deobfuscation**: JSFuck, AAEncode, JJEncode, Base64, URL, Hex, Unicode, Smart Decode
+- **Obfuscation**: 
+  - **MurrCoder (Extreme)**: Custom extreme obfuscation with char code arrays and mathematical operations
+  - **MurrCoder (Advanced)**: Advanced obfuscation with string encoding and variable renaming
+  - AAEncode, JJEncode, Hex, Unicode, URL, Base64
+- **Multi-language support**: English, Russian, German
+- **Compare Mode**: Side-by-side code comparison
+- **Run Code**: Execute obfuscated code directly in the browser
 - Built with **React + TypeScript + Vite**
 
 ## Quick Start

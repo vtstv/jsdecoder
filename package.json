@@ -1,5 +1,5 @@
 {
-  "name": "jsdecoder",
+  "name": "js-code-deobfuscator",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { css } from '@emotion/react';
+import { css, Global } from '@emotion/react';
 import { CodeTransformer } from './utils/codeTransformer';
 import { Language, getTranslation } from './i18n/translations';
 import { Theme, darkTheme, lightTheme } from './theme/theme';
@@ -22,6 +22,8 @@ function App() {
   const [language, setLanguage] = useState<Language>('en');
   const [code, setCode] = useState('');
   const [showLangDropdown, setShowLangDropdown] = useState(false);
+  const [showDeobfuscateDropdown, setShowDeobfuscateDropdown] = useState(false);
+  const [showObfuscateDropdown, setShowObfuscateDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [originalCode, setOriginalCode] = useState('');
@@ -150,6 +152,195 @@ function App() {
     setCompareMode(!compareMode);
   }, [compareMode, originalCode, code]);
 
+  // Deobfuscation handlers
+  const handleSmartDecode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.smartDecode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeJSFuck = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeJSFuck(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeAAEncode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeAAEncode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeJJEncode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeJJEncode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeURL = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeURL(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeBase64 = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeBase64(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeHex = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeHex(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeUnicode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeUnicode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleUnpackArray = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.unpackArrayObfuscation(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  // Obfuscation handlers
+  const handleEncodeAAEncode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeAAEncode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleEncodeJJEncode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeJJEncode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleEncodeHex = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeHex(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleEncodeUnicode = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeUnicode(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleEncodeURL = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeURL(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleEncodeBase64 = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeBase64(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleObfuscateAdvanced = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.obfuscateAdvanced(code, {
+        stringEncoding: 'hex',
+        controlFlow: true,
+        deadCode: true
+      });
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleEncodeMurrCoder = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.encodeMurrCoderExtreme(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleRun = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      // Execute the code in a safe context
+      const result = eval(code);
+      if (result !== undefined) {
+        console.log('Execution result:', result);
+      }
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
   const containerStyle = css`
     min-height: 100vh;
     background: ${theme.background};
@@ -157,6 +348,7 @@ function App() {
     padding: 2rem;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     transition: all 0.3s ease;
+    box-sizing: border-box;
   `;
 
   const headerStyle = css`
@@ -273,35 +465,6 @@ function App() {
     }
   `;
 
-  const textareaActionsStyle = css`
-    position: absolute;
-    top: 0.5rem;
-    right: 1.5rem;
-    display: flex;
-    gap: 0.5rem;
-  `;
-
-  const smallButtonStyle = css`
-    background: ${theme.surface}ee;
-    color: ${theme.text};
-    border: 1px solid ${theme.border};
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-
-    &:hover {
-      background: ${theme.border}ee;
-    }
-
-    &:active {
-      transform: translateY(1px);
-    }
-  `;
-
   const actionGroupStyle = css`
     display: flex;
     gap: 0.75rem;
@@ -385,9 +548,31 @@ function App() {
     border: 1px solid ${theme.border};
     border-radius: 6px;
     box-shadow: 0 4px 12px ${theme.shadow};
-    min-width: 70px;
+    min-width: 200px;
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: auto;
     z-index: 1000;
-    overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: ${theme.surface};
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: ${theme.border};
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      background: ${theme.primary};
+    }
   `;
 
   const dropdownItemStyle = css`
@@ -395,14 +580,41 @@ function App() {
     cursor: pointer;
     transition: background 0.2s ease;
     color: ${theme.text};
+    font-size: 0.85rem;
+    border-bottom: 1px solid ${theme.border};
+    border-right: 1px solid ${theme.border};
 
     &:hover {
       background: ${theme.border};
     }
+    
+    &:nth-of-type(2n) {
+      border-right: none;
+    }
   `;
 
   return (
-    <div css={containerStyle}>
+    <>
+      <Global
+        styles={css`
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+          }
+          
+          body {
+            background: ${theme.background};
+          }
+        `}
+      />
+      <div css={containerStyle}>
       <header css={headerStyle}>
         <h1 css={titleStyle}>{t.title}</h1>
         <div css={controlsStyle}>
@@ -437,6 +649,22 @@ function App() {
       </header>
 
       <main css={mainContentStyle}>
+        {/* Action buttons above textarea */}
+        <div css={css`display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; justify-content: center;`}>
+          <button css={secondaryButtonStyle} onClick={toggleCompare}>
+            {t.compareMode}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handlePaste}>
+            {t.paste}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handleCopy}>
+            {copied ? t.copied : t.copy}
+          </button>
+          <button css={buttonStyle} onClick={handleRun}>
+            {t.run}
+          </button>
+        </div>
+
         {compareMode ? (
           <div css={css`display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;`}>
             <div css={textareaContainerStyle}>
@@ -456,11 +684,6 @@ function App() {
                 onChange={(e) => setCode(e.target.value)}
                 placeholder={t.outputPlaceholder}
               />
-              <div css={textareaActionsStyle}>
-                <button css={smallButtonStyle} onClick={handleCopy}>
-                  {copied ? t.copied : t.copy}
-                </button>
-              </div>
             </div>
           </div>
         ) : (
@@ -471,14 +694,6 @@ function App() {
               onChange={(e) => setCode(e.target.value)}
               placeholder={t.inputPlaceholder}
             />
-            <div css={textareaActionsStyle}>
-              <button css={smallButtonStyle} onClick={handlePaste}>
-                {t.paste}
-              </button>
-              <button css={smallButtonStyle} onClick={handleCopy}>
-                {copied ? t.copied : t.copy}
-              </button>
-            </div>
           </div>
         )}
 
@@ -489,6 +704,92 @@ function App() {
           <button css={buttonStyle} onClick={handleAutoDecodeAll}>
             {t.autoDecodeAll}
           </button>
+          
+          {/* Deobfuscation Dropdown */}
+          <div css={dropdownContainerStyle}>
+            <button 
+              css={dropdownButtonStyle} 
+              onClick={() => {
+                setShowDeobfuscateDropdown(!showDeobfuscateDropdown);
+                setShowObfuscateDropdown(false);
+              }}
+            >
+              {t.deobfuscation}
+            </button>
+            {showDeobfuscateDropdown && (
+              <div css={dropdownMenuStyle}>
+                <div css={dropdownItemStyle} onClick={() => { handleSmartDecode(); setShowDeobfuscateDropdown(false); }}>
+                  {t.smartDecode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeJSFuck(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeJSFuck}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeAAEncode(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeAAEncode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeJJEncode(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeJJEncode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeURL(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeURL}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeBase64(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeBase64}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeHex(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeHex}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleDecodeUnicode(); setShowDeobfuscateDropdown(false); }}>
+                  {t.decodeUnicode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleUnpackArray(); setShowDeobfuscateDropdown(false); }}>
+                  {t.unpackArray}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Obfuscation Dropdown */}
+          <div css={dropdownContainerStyle}>
+            <button 
+              css={dropdownButtonStyle} 
+              onClick={() => {
+                setShowObfuscateDropdown(!showObfuscateDropdown);
+                setShowDeobfuscateDropdown(false);
+              }}
+            >
+              {t.obfuscation}
+            </button>
+            {showObfuscateDropdown && (
+              <div css={dropdownMenuStyle}>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeMurrCoder(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeMurrCoder}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleObfuscateAdvanced(); setShowObfuscateDropdown(false); }}>
+                  {t.obfuscateAdvanced}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeAAEncode(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeAAEncode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeJJEncode(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeJJEncode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeHex(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeHex}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeUnicode(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeUnicode}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeURL(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeURL}
+                </div>
+                <div css={dropdownItemStyle} onClick={() => { handleEncodeBase64(); setShowObfuscateDropdown(false); }}>
+                  {t.encodeBase64}
+                </div>
+              </div>
+            )}
+          </div>
+
           <button css={secondaryButtonStyle} onClick={handleBeautify}>
             {t.beautify}
           </button>
@@ -500,9 +801,6 @@ function App() {
           </button>
           <button css={secondaryButtonStyle} onClick={handleDecodeStrings}>
             {t.decodeStrings}
-          </button>
-          <button css={secondaryButtonStyle} onClick={toggleCompare}>
-            {t.compareMode}
           </button>
           <button css={secondaryButtonStyle} onClick={handleClear}>
             {t.clear}
@@ -525,8 +823,12 @@ function App() {
         <p>
           {t.copyrightText} | <a href="https://github.com/vtstv" target="_blank" rel="noopener noreferrer">GitHub: vtstv</a>
         </p>
+        <p css={css`font-size: 0.85rem; margin-top: 0.5rem; color: ${theme.text}; opacity: 0.8;`}>
+          ⚠️ {t.disclaimer}
+        </p>
       </footer>
     </div>
+    </>
   );
 }
 

@@ -26,11 +26,34 @@ export interface Translations {
   renameVars: string;
   decodeStrings: string;
   customTemplate: string;
+  decodeJSFuck: string;
+  decodeAAEncode: string;
+  decodeJJEncode: string;
+  decodeURL: string;
+  decodeBase64: string;
+  decodeHex: string;
+  decodeUnicode: string;
+  unpackArray: string;
+  smartDecode: string;
+  encodeAAEncode: string;
+  encodeJJEncode: string;
+  encodeHex: string;
+  encodeUnicode: string;
+  encodeURL: string;
+  encodeBase64: string;
+  obfuscateAdvanced: string;
+  // Dropdown labels
+  deobfuscation: string;
+  obfuscation: string;
+  run: string;
+  encodeMurrCoder: string;
+  // Disclaimer
+  disclaimer: string;
 }
 
 export const translations: Record<Language, Translations> = {
   en: {
-    title: 'JS Decoder',
+    title: 'JS Code Deobfuscator / Obfuscator',
     decode: 'Decode',
     encode: 'Encode',
     clear: 'Clear',
@@ -55,9 +78,32 @@ export const translations: Record<Language, Translations> = {
     renameVars: 'Rename Vars',
     decodeStrings: 'Decode Strings',
     customTemplate: 'Custom Template',
+    decodeJSFuck: 'Decode JSFuck',
+    decodeAAEncode: 'Decode AAEncode',
+    decodeJJEncode: 'Decode JJEncode',
+    decodeURL: 'Decode URL',
+    decodeBase64: 'Decode Base64',
+    decodeHex: 'Decode Hex',
+    decodeUnicode: 'Decode Unicode',
+    unpackArray: 'Unpack Array',
+    smartDecode: 'Smart Decode',
+    encodeAAEncode: 'Encode AAEncode',
+    encodeJJEncode: 'Encode JJEncode',
+    encodeHex: 'Encode Hex',
+    encodeUnicode: 'Encode Unicode',
+    encodeURL: 'Encode URL',
+    encodeBase64: 'Encode Base64',
+    obfuscateAdvanced: 'MurrCoder (Advanced)',
+    // Dropdown labels
+    deobfuscation: 'Deobfuscation',
+    obfuscation: 'Obfuscation',
+    run: 'Run',
+    encodeMurrCoder: 'MurrCoder (Extreme)',
+    // Disclaimer
+    disclaimer: 'Note: This tool may not decrypt some multi-layered encodings and MurrCoder methods. Always verify code functionality before use.',
   },
   ru: {
-    title: 'JS Декодер / Кодер',
+    title: 'JS Code Деобфускатор / Обфускатор',
     decode: 'Декодировать',
     encode: 'Кодировать',
     clear: 'Очистить',
@@ -82,9 +128,33 @@ export const translations: Record<Language, Translations> = {
     renameVars: 'Переименовать',
     decodeStrings: 'Декодировать строки',
     customTemplate: 'Свой шаблон',
+    // New deobfuscation methods
+    decodeJSFuck: 'Декодировать JSFuck',
+    decodeAAEncode: 'Декодировать AAEncode',
+    decodeJJEncode: 'Декодировать JJEncode',
+    decodeURL: 'Декодировать URL',
+    decodeBase64: 'Декодировать Base64',
+    decodeHex: 'Декодировать Hex',
+    decodeUnicode: 'Декодировать Unicode',
+    unpackArray: 'Распаковать массив',
+    smartDecode: 'Умное декодирование',
+    encodeAAEncode: 'Кодировать AAEncode',
+    encodeJJEncode: 'Кодировать JJEncode',
+    encodeHex: 'Кодировать Hex',
+    encodeUnicode: 'Кодировать Unicode',
+    encodeURL: 'Кодировать URL',
+    encodeBase64: 'Кодировать Base64',
+    obfuscateAdvanced: 'MurrCoder (Продвинутый)',
+    // Dropdown labels
+    deobfuscation: 'Деобфускация',
+    obfuscation: 'Обфускация',
+    run: 'Выполнить',
+    encodeMurrCoder: 'MurrCoder (Экстремальный)',
+    // Disclaimer
+    disclaimer: 'Примечание: Данная утилита может не расшифровать некоторые многослойные кодирования и MurrCoder методы. Всегда проверяйте работоспособность кода перед использованием.',
   },
   de: {
-    title: 'JS Decoder',
+    title: 'JS Code Deobfuscator / Obfuscator',
     decode: 'Dekodieren',
     encode: 'Kodieren',
     clear: 'L\u00f6schen',
@@ -109,6 +179,29 @@ export const translations: Record<Language, Translations> = {
     renameVars: 'Vars umbenennen',
     decodeStrings: 'Strings dekodieren',
     customTemplate: 'Eigene Vorlage',
+    decodeJSFuck: 'JSFuck dekodieren',
+    decodeAAEncode: 'AAEncode dekodieren',
+    decodeJJEncode: 'JJEncode dekodieren',
+    decodeURL: 'URL dekodieren',
+    decodeBase64: 'Base64 dekodieren',
+    decodeHex: 'Hex dekodieren',
+    decodeUnicode: 'Unicode dekodieren',
+    unpackArray: 'Array entpacken',
+    smartDecode: 'Intelligentes Dekodieren',
+    encodeAAEncode: 'AAEncode kodieren',
+    encodeJJEncode: 'JJEncode kodieren',
+    encodeHex: 'Hex kodieren',
+    encodeUnicode: 'Unicode kodieren',
+    encodeURL: 'URL kodieren',
+    encodeBase64: 'Base64 kodieren',
+    obfuscateAdvanced: 'MurrCoder (Erweitert)',
+    // Dropdown labels
+    deobfuscation: 'Entschlüsselung',
+    obfuscation: 'Verschleierung',
+    run: 'Ausführen',
+    encodeMurrCoder: 'MurrCoder (Extrem)',
+    // Disclaimer
+    disclaimer: 'Hinweis: Dieses Tool kann einige mehrschichtige Kodierungen und MurrCoder-Methoden möglicherweise nicht entschlüsseln. Überprüfen Sie immer die Funktionalität des Codes vor der Verwendung.',
   },
 };
 
