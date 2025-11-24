@@ -12,6 +12,7 @@ interface UseDeobfuscationHandlersProps {
   setCode: (code: string) => void;
   setOutputCode: (code: string) => void;
   t: Translations;
+  setDialogMessage: (message: string) => void;
 }
 
 export const useDeobfuscationHandlers = ({
@@ -21,6 +22,7 @@ export const useDeobfuscationHandlers = ({
   setCode,
   setOutputCode,
   t,
+  setDialogMessage,
 }: UseDeobfuscationHandlersProps) => {
   const handleSmartDecode = useCallback(() => {
     const sourceCode = splitMode ? inputCode : code;
@@ -33,7 +35,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -48,7 +50,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -63,7 +65,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -78,7 +80,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -93,7 +95,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -108,7 +110,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -123,7 +125,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -138,7 +140,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -153,7 +155,7 @@ export const useDeobfuscationHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -169,3 +171,4 @@ export const useDeobfuscationHandlers = ({
     handleUnpackArray,
   };
 };
+

@@ -12,6 +12,7 @@ interface UseUtilityHandlersProps {
   setCode: (code: string) => void;
   setOutputCode: (code: string) => void;
   t: Translations;
+  setDialogMessage: (message: string) => void;
 }
 
 export const useUtilityHandlers = ({
@@ -21,6 +22,7 @@ export const useUtilityHandlers = ({
   setCode,
   setOutputCode,
   t,
+  setDialogMessage,
 }: UseUtilityHandlersProps) => {
   const handleBeautify = useCallback(() => {
     const sourceCode = splitMode ? inputCode : code;
@@ -63,7 +65,7 @@ export const useUtilityHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -78,7 +80,7 @@ export const useUtilityHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -95,7 +97,7 @@ export const useUtilityHandlers = ({
         setCode(result);
       }
     } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+      setDialogMessage(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, inputCode, splitMode, t.errorPrefix]);
 
@@ -107,3 +109,4 @@ export const useUtilityHandlers = ({
     handleAutoDecodeAll,
   };
 };
+

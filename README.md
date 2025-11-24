@@ -1,8 +1,8 @@
 # JS Code Deobfuscator / Obfuscator
 
-<img width="1995" height="1091" alt="image" src="https://github.com/user-attachments/assets/32a9f43e-293b-4b00-9a10-0c0c89277021" />
-
 A powerful React TypeScript application for deobfuscating, obfuscating, and analyzing JavaScript code with advanced security scanning.
+
+<img width="2015" height="1171" alt="image" src="https://github.com/user-attachments/assets/d5647d2c-eac0-45be-a8f9-acae0fda2030" />
 
 ## ✨ Features
 
@@ -20,7 +20,7 @@ A powerful React TypeScript application for deobfuscating, obfuscating, and anal
 - **AAEncode, JJEncode**: Japanese and symbol-based encoding
 - **Hex, Unicode, URL, Base64**: Standard encoding methods
 
-### 🛡️ Security Features
+### 🛡️ Security Features (WIP)
 - **🔒 Malware Scanner**: Detects malicious patterns in JavaScript code
   - Identifies base64-encoded eval execution
   - Detects dynamic script injection
@@ -83,28 +83,6 @@ npm run build
 
 The compiled static files will be in the `dist/` folder, ready for deployment to any static hosting service.
 
-## 🏗️ Architecture
-
-### Project Structure
-```
-src/
-├── components/          # React components
-│   ├── CodeEditor.tsx  # Monaco Editor wrapper
-│   └── SecurityPanel.tsx # Security scan results UI
-├── hooks/              # Custom React hooks
-│   ├── useDeobfuscationHandlers.ts
-│   ├── useObfuscationHandlers.ts
-│   └── useUtilityHandlers.ts
-├── utils/              # Core functionality
-│   ├── codeTransformer.ts  # Main transformation logic
-│   ├── encoders.ts         # Encoding methods
-│   ├── decoders.ts         # Decoding methods
-│   └── securityScanner.ts  # Security analysis
-├── i18n/               # Internationalization
-│   └── translations.ts
-└── theme/              # UI themes
-    └── theme.ts
-```
 
 ### Technologies
 - **React 18** with TypeScript

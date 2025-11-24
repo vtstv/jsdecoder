@@ -7,7 +7,7 @@ export interface SecurityScanResult {
   isSafe: boolean;
   threatLevel: 'safe' | 'low' | 'medium' | 'high' | 'critical';
   threats: SecurityThreat[];
-  score: number; // 0-100, где 100 = полностью безопасный
+  score: number; // 0-100, where 100 = is absolute safe
 }
 
 export interface SecurityThreat {
