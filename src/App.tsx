@@ -39,14 +39,7 @@ function App() {
       return;
     }
     try {
-      let codeToProcess = code.trim();
-      
-      const evalMatch = codeToProcess.match(/eval\s*\([\s\S]*\);?/);
-      if (evalMatch) {
-        codeToProcess = evalMatch[0];
-      }
-      
-      const result = CodeTransformer.decode(codeToProcess);
+      const result = CodeTransformer.smartDecode(code);
       setCode(result);
     } catch (error) {
       alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
