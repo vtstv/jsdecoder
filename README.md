@@ -5,7 +5,6 @@ A modern React TypeScript application for decoding and encoding JavaScript eval-
 ## Features
 
 - **Decode** eval-packed JavaScript code
-- **Encode** JavaScript code with Base62 or simple compression
 - Built with **React + TypeScript + Vite**
 
 ## Quick Start
