@@ -21,11 +21,16 @@ export interface Translations {
   minify: string;
   download: string;
   layersDetected: string;
+  autoDecodeAll: string;
+  compareMode: string;
+  renameVars: string;
+  decodeStrings: string;
+  customTemplate: string;
 }
 
 export const translations: Record<Language, Translations> = {
   en: {
-    title: 'JS Decoder / Encoder',
+    title: 'JS Decoder',
     decode: 'Decode',
     encode: 'Encode',
     clear: 'Clear',
@@ -40,11 +45,16 @@ export const translations: Record<Language, Translations> = {
     copy: 'Copy',
     paste: 'Paste',
     copied: 'Copied!',
-    customVars: 'Custom Vars (m,u,r,R)',
+    customVars: 'Custom Vars (m,u,r,r)',
     beautify: 'Beautify',
     minify: 'Minify',
     download: 'Download',
     layersDetected: 'Layers',
+    autoDecodeAll: 'Auto-Decode All',
+    compareMode: 'Compare',
+    renameVars: 'Rename Vars',
+    decodeStrings: 'Decode Strings',
+    customTemplate: 'Custom Template',
   },
   ru: {
     title: 'JS Декодер / Кодер',
@@ -62,14 +72,19 @@ export const translations: Record<Language, Translations> = {
     copy: 'Копировать',
     paste: 'Вставить',
     copied: 'Скопировано!',
-    customVars: 'Свои переменные (m,u,r,R)',
+    customVars: 'Свои переменные (m,u,r,r)',
     beautify: 'Форматировать',
     minify: 'Сжать',
     download: 'Скачать',
     layersDetected: 'Слоёв',
+    autoDecodeAll: 'Авто-декодировать всё',
+    compareMode: 'Сравнить',
+    renameVars: 'Переименовать',
+    decodeStrings: 'Декодировать строки',
+    customTemplate: 'Свой шаблон',
   },
   de: {
-    title: 'JS Decoder / Encoder',
+    title: 'JS Decoder',
     decode: 'Dekodieren',
     encode: 'Kodieren',
     clear: 'L\u00f6schen',
@@ -84,11 +99,16 @@ export const translations: Record<Language, Translations> = {
     copy: 'Kopieren',
     paste: 'Einf\u00fcgen',
     copied: 'Kopiert!',
-    customVars: 'Eigene Variablen (m,u,r,R)',
+    customVars: 'Eigene Variablen (m,u,r,r)',
     beautify: 'Formatieren',
     minify: 'Minimieren',
     download: 'Herunterladen',
     layersDetected: 'Ebenen',
+    autoDecodeAll: 'Auto-Dekodieren',
+    compareMode: 'Vergleichen',
+    renameVars: 'Vars umbenennen',
+    decodeStrings: 'Strings dekodieren',
+    customTemplate: 'Eigene Vorlage',
   },
 };
 

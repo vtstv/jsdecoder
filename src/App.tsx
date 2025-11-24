@@ -21,10 +21,10 @@ function App() {
   const [theme, setTheme] = useState<Theme>(darkTheme);
   const [language, setLanguage] = useState<Language>('en');
   const [code, setCode] = useState('');
-  const [useBase62, setUseBase62] = useState(true);
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [useCustomVars, setUseCustomVars] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
+  const [originalCode, setOriginalCode] = useState('');
 
   const t = getTranslation(language);
 
@@ -50,18 +50,6 @@ function App() {
       alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }, [code, t.errorPrefix]);
-
-  const handleEncode = useCallback(() => {
-    if (!code.trim()) {
-      return;
-    }
-    try {
-      const result = CodeTransformer.encode(code, useBase62, useCustomVars);
-      setCode(result);
-    } catch (error) {
-      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
-    }
-  }, [code, useBase62, useCustomVars, t.errorPrefix]);
 
   const handleClear = useCallback(() => {
     setCode('');
@@ -122,6 +110,45 @@ function App() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }, [code]);
+
+  const handleAutoDecodeAll = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      setOriginalCode(code);
+      const result = CodeTransformer.autoDecodeAll(code);
+      setCode(result);
+      setCompareMode(true);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleRenameVars = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.renameVariables(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const handleDecodeStrings = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.decodeStrings(code);
+      setCode(result);
+    } catch (error) {
+      alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }, [code, t.errorPrefix]);
+
+  const toggleCompare = useCallback(() => {
+    if (!compareMode && !originalCode) {
+      setOriginalCode(code);
+    }
+    setCompareMode(!compareMode);
+  }, [compareMode, originalCode, code]);
 
   const containerStyle = css`
     min-height: 100vh;
@@ -224,7 +251,7 @@ function App() {
 
   const textareaStyle = css`
     width: 100%;
-    min-height: 200px;
+    min-height: 300px;
     padding: 1rem;
     background: ${theme.surface};
     color: ${theme.text};
@@ -249,7 +276,7 @@ function App() {
   const textareaActionsStyle = css`
     position: absolute;
     top: 0.5rem;
-    right: 0.5rem;
+    right: 1.5rem;
     display: flex;
     gap: 0.5rem;
   `;
@@ -410,35 +437,72 @@ function App() {
       </header>
 
       <main css={mainContentStyle}>
-        <div css={textareaContainerStyle}>
-          <textarea
-            css={textareaStyle}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder={t.inputPlaceholder}
-          />
-          <div css={textareaActionsStyle}>
-            <button css={smallButtonStyle} onClick={handlePaste}>
-              {t.paste}
-            </button>
-            <button css={smallButtonStyle} onClick={handleCopy}>
-              {copied ? t.copied : t.copy}
-            </button>
+        {compareMode ? (
+          <div css={css`display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;`}>
+            <div css={textareaContainerStyle}>
+              <div css={css`font-weight: 600; margin-bottom: 0.5rem; color: ${theme.text};`}>Original</div>
+              <textarea
+                css={textareaStyle}
+                value={originalCode}
+                readOnly
+                placeholder={t.inputPlaceholder}
+              />
+            </div>
+            <div css={textareaContainerStyle}>
+              <div css={css`font-weight: 600; margin-bottom: 0.5rem; color: ${theme.text};`}>Decoded</div>
+              <textarea
+                css={textareaStyle}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder={t.outputPlaceholder}
+              />
+              <div css={textareaActionsStyle}>
+                <button css={smallButtonStyle} onClick={handleCopy}>
+                  {copied ? t.copied : t.copy}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div css={textareaContainerStyle}>
+            <textarea
+              css={textareaStyle}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder={t.inputPlaceholder}
+            />
+            <div css={textareaActionsStyle}>
+              <button css={smallButtonStyle} onClick={handlePaste}>
+                {t.paste}
+              </button>
+              <button css={smallButtonStyle} onClick={handleCopy}>
+                {copied ? t.copied : t.copy}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div css={actionGroupStyle}>
           <button css={buttonStyle} onClick={handleDecode}>
             {t.decode}
           </button>
-          <button css={buttonStyle} onClick={handleEncode}>
-            {t.encode}
+          <button css={buttonStyle} onClick={handleAutoDecodeAll}>
+            {t.autoDecodeAll}
           </button>
           <button css={secondaryButtonStyle} onClick={handleBeautify}>
             {t.beautify}
           </button>
           <button css={secondaryButtonStyle} onClick={handleMinify}>
             {t.minify}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handleRenameVars}>
+            {t.renameVars}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handleDecodeStrings}>
+            {t.decodeStrings}
+          </button>
+          <button css={secondaryButtonStyle} onClick={toggleCompare}>
+            {t.compareMode}
           </button>
           <button css={secondaryButtonStyle} onClick={handleClear}>
             {t.clear}
@@ -449,30 +513,6 @@ function App() {
           <button css={secondaryButtonStyle} onClick={handleLoadExample}>
             {t.loadExample}
           </button>
-          <div css={checkboxContainerStyle}>
-            <input
-              type="checkbox"
-              id="base62"
-              checked={useBase62}
-              onChange={(e) => setUseBase62(e.target.checked)}
-            />
-            <label htmlFor="base62">
-              {useBase62 ? t.base62Encode : t.simpleCompress}
-            </label>
-          </div>
-          {useBase62 && (
-            <div css={checkboxContainerStyle}>
-              <input
-                type="checkbox"
-                id="customVars"
-                checked={useCustomVars}
-                onChange={(e) => setUseCustomVars(e.target.checked)}
-              />
-              <label htmlFor="customVars">
-                {t.customVars}
-              </label>
-            </div>
-          )}
           {code.includes('eval(') && (
             <div css={checkboxContainerStyle}>
               <span>{t.layersDetected}: {CodeTransformer.detectEvalLayers(code)}</span>
