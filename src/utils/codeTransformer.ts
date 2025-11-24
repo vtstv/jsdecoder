@@ -9,8 +9,6 @@ export interface PackerResult {
 }
 
 export class CodeTransformer {
-  private static readonly BASE62_CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
   private static evalHolder = window.eval;
 
   static decode(evalJsCode: string): string {
@@ -32,68 +30,36 @@ export class CodeTransformer {
     }
   }
 
-  static encode(sourceCode: string, base62: boolean = true): string {
+  static encode(sourceCode: string, base62: boolean = true, useCustomVars: boolean = false): string {
     if (!base62) {
       return this.simpleCompress(sourceCode);
     }
 
-    const tokens = this.tokenize(sourceCode);
-    const { dictionary, mapping } = this.buildDictionary(tokens);
-    const compressed = this.replaceTokens(sourceCode, mapping);
+    const tokens = this.extractTokens(sourceCode);
+    const dictionary = tokens.filter((token, index, self) => 
+      self.indexOf(token) === index && token.length > 1
+    );
+    
+    let compressed = sourceCode;
+    dictionary.forEach((token, index) => {
+      const regex = new RegExp(`\\b${this.escapeRegex(token)}\\b`, 'g');
+      compressed = compressed.replace(regex, index.toString());
+    });
 
-    return this.wrapInPacker(compressed, dictionary);
+    return this.wrapInPacker(compressed, dictionary, useCustomVars);
   }
 
-  private static tokenize(code: string): string[] {
+  private static extractTokens(code: string): string[] {
     const tokenPattern = /\b[a-zA-Z_$][a-zA-Z0-9_$]*\b/g;
     const matches = code.match(tokenPattern) || [];
-    const frequency = new Map<string, number>();
-
-    matches.forEach(token => {
-      frequency.set(token, (frequency.get(token) || 0) + 1);
-    });
-
-    return Array.from(frequency.entries())
-      .filter(([token, count]) => count > 1 && token.length > 2)
-      .sort((a, b) => b[1] - a[1])
-      .map(([token]) => token);
+    return matches;
   }
 
-  private static buildDictionary(tokens: string[]): { dictionary: string[]; mapping: Map<string, string> } {
-    const dictionary: string[] = [];
-    const mapping = new Map<string, string>();
-
-    tokens.forEach((token, index) => {
-      dictionary.push(token);
-      mapping.set(token, this.toBase62(index));
-    });
-
-    return { dictionary, mapping };
+  private static escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
-  private static toBase62(num: number): string {
-    if (num === 0) return '0';
-    
-    let result = '';
-    while (num > 0) {
-      result = this.BASE62_CHARS[num % 62] + result;
-      num = Math.floor(num / 62);
-    }
-    return result;
-  }
-
-  private static replaceTokens(code: string, mapping: Map<string, string>): string {
-    let result = code;
-    
-    mapping.forEach((replacement, token) => {
-      const regex = new RegExp(`\\b${token}\\b`, 'g');
-      result = result.replace(regex, replacement);
-    });
-
-    return result;
-  }
-
-  private static wrapInPacker(compressed: string, dictionary: string[]): string {
+  private static wrapInPacker(compressed: string, dictionary: string[], useCustomVars: boolean = false): string {
     const escapedCode = compressed
       .replace(/\\/g, '\\\\')
       .replace(/'/g, "\\'")
@@ -102,6 +68,10 @@ export class CodeTransformer {
 
     const dictString = dictionary.join('|');
     const base = dictionary.length;
+
+    if (useCustomVars) {
+      return `eval(function(m,u,r,R,_,__){_=String;if(!''.replace(/^/,String)){while(r--)__[r]=R[r]||r;R=[function(_){return __[_]}];_=function(){return'\\\\w+'};r=1};while(r--)if(R[r])m=m.replace(new RegExp('\\\\b'+_(r)+'\\\\b','g'),R[r]);return m}('${escapedCode}',${base},${base},'${dictString}'.split('|'),0,{}))`;
+    }
 
     return `eval(function(p,a,c,k,e,r){e=String;if(!''.replace(/^/,String)){while(c--)r[c]=k[c]||c;k=[function(e){return r[e]}];e=function(){return'\\\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('${escapedCode}',${base},${base},'${dictString}'.split('|'),0,{}))`;
   }
@@ -112,5 +82,69 @@ export class CodeTransformer {
       .replace(/\/\/.*/g, '')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  static beautify(code: string): string {
+    let result = code;
+    let indent = 0;
+    const indentStr = '  ';
+    let formatted = '';
+    let inString = false;
+    let stringChar = '';
+
+    for (let i = 0; i < result.length; i++) {
+      const char = result[i];
+      const prevChar = result[i - 1];
+
+      if ((char === '"' || char === "'") && prevChar !== '\\') {
+        if (!inString) {
+          inString = true;
+          stringChar = char;
+        } else if (char === stringChar) {
+          inString = false;
+        }
+      }
+
+      if (!inString) {
+        if (char === '{' || char === '[') {
+          formatted += char + '\n' + indentStr.repeat(++indent);
+          continue;
+        }
+        if (char === '}' || char === ']') {
+          formatted += '\n' + indentStr.repeat(--indent) + char;
+          continue;
+        }
+        if (char === ';') {
+          formatted += char + '\n' + indentStr.repeat(indent);
+          continue;
+        }
+      }
+
+      formatted += char;
+    }
+
+    return formatted.trim();
+  }
+
+  static minify(code: string): string {
+    return code
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*/g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s*([{}();,:<>!=+\-*\/&|?])\s*/g, '$1')
+      .trim();
+  }
+
+  static detectEvalLayers(code: string): number {
+    let layers = 0;
+    let current = code;
+    
+    while (current.includes('eval(')) {
+      layers++;
+      if (layers > 10) break;
+      current = current.substring(current.indexOf('eval(') + 5);
+    }
+    
+    return layers;
   }
 }

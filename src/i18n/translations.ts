@@ -16,6 +16,11 @@ export interface Translations {
   copy: string;
   paste: string;
   copied: string;
+  customVars: string;
+  beautify: string;
+  minify: string;
+  download: string;
+  layersDetected: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -28,13 +33,18 @@ export const translations: Record<Language, Translations> = {
     inputPlaceholder: 'Paste your eval-packed code here...',
     outputPlaceholder: 'Result will appear here...',
     errorPrefix: 'Error: ',
-    copyrightText: '© 2025 Murr',
+    copyrightText: '\u00a9 2025 Murr',
     toggleTheme: 'Toggle Theme',
     base62Encode: 'Base62 Encoding',
     simpleCompress: 'Simple Compression',
     copy: 'Copy',
     paste: 'Paste',
     copied: 'Copied!',
+    customVars: 'Custom Vars (m,u,r,R)',
+    beautify: 'Beautify',
+    minify: 'Minify',
+    download: 'Download',
+    layersDetected: 'Layers',
   },
   ru: {
     title: 'JS Декодер / Кодер',
@@ -52,23 +62,33 @@ export const translations: Record<Language, Translations> = {
     copy: 'Копировать',
     paste: 'Вставить',
     copied: 'Скопировано!',
+    customVars: 'Свои переменные (m,u,r,R)',
+    beautify: 'Форматировать',
+    minify: 'Сжать',
+    download: 'Скачать',
+    layersDetected: 'Слоёв',
   },
   de: {
     title: 'JS Decoder / Encoder',
     decode: 'Dekodieren',
     encode: 'Kodieren',
-    clear: 'Löschen',
+    clear: 'L\u00f6schen',
     loadExample: 'Beispiel laden',
-    inputPlaceholder: 'Fügen Sie Ihren verpackten Code hier ein...',
+    inputPlaceholder: 'F\u00fcgen Sie Ihren verpackten Code hier ein...',
     outputPlaceholder: 'Das Ergebnis wird hier angezeigt...',
     errorPrefix: 'Fehler: ',
-    copyrightText: '© 2025 Murr',
+    copyrightText: '\u00a9 2025 Murr',
     toggleTheme: 'Thema wechseln',
     base62Encode: 'Base62-Kodierung',
     simpleCompress: 'Einfache Kompression',
     copy: 'Kopieren',
-    paste: 'Einfügen',
+    paste: 'Einf\u00fcgen',
     copied: 'Kopiert!',
+    customVars: 'Eigene Variablen (m,u,r,R)',
+    beautify: 'Formatieren',
+    minify: 'Minimieren',
+    download: 'Herunterladen',
+    layersDetected: 'Ebenen',
   },
 };
 

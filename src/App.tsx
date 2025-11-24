@@ -24,6 +24,7 @@ function App() {
   const [useBase62, setUseBase62] = useState(true);
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [useCustomVars, setUseCustomVars] = useState(false);
 
   const t = getTranslation(language);
 
@@ -36,7 +37,14 @@ function App() {
       return;
     }
     try {
-      const result = CodeTransformer.decode(code);
+      let codeToProcess = code.trim();
+      
+      const evalMatch = codeToProcess.match(/eval\s*\([\s\S]*\);?/);
+      if (evalMatch) {
+        codeToProcess = evalMatch[0];
+      }
+      
+      const result = CodeTransformer.decode(codeToProcess);
       setCode(result);
     } catch (error) {
       alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
@@ -48,12 +56,12 @@ function App() {
       return;
     }
     try {
-      const result = CodeTransformer.encode(code, useBase62);
+      const result = CodeTransformer.encode(code, useBase62, useCustomVars);
       setCode(result);
     } catch (error) {
       alert(t.errorPrefix + (error instanceof Error ? error.message : 'Unknown error'));
     }
-  }, [code, useBase62, t.errorPrefix]);
+  }, [code, useBase62, useCustomVars, t.errorPrefix]);
 
   const handleClear = useCallback(() => {
     setCode('');
@@ -81,6 +89,39 @@ function App() {
       console.error('Failed to paste:', err);
     }
   }, []);
+
+  const handleBeautify = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.beautify(code);
+      setCode(result);
+    } catch (err) {
+      console.error('Failed to beautify:', err);
+    }
+  }, [code]);
+
+  const handleMinify = useCallback(() => {
+    if (!code.trim()) return;
+    try {
+      const result = CodeTransformer.minify(code);
+      setCode(result);
+    } catch (err) {
+      console.error('Failed to minify:', err);
+    }
+  }, [code]);
+
+  const handleDownload = useCallback(() => {
+    if (!code.trim()) return;
+    const blob = new Blob([code], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'code.js';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [code]);
 
   const containerStyle = css`
     min-height: 100vh;
@@ -285,14 +326,14 @@ function App() {
     background: ${theme.surface};
     color: ${theme.text};
     border: 1px solid ${theme.border};
-    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    padding: 0.6rem 2rem 0.6rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.95rem;
     font-weight: 500;
     transition: all 0.2s ease;
     position: relative;
-    min-width: 120px;
+    min-width: 70px;
     text-align: left;
 
     &:hover {
@@ -302,7 +343,7 @@ function App() {
     &::after {
       content: '▼';
       position: absolute;
-      right: 0.8rem;
+      right: 0.6rem;
       top: 50%;
       transform: translateY(-50%);
       font-size: 0.7rem;
@@ -317,7 +358,7 @@ function App() {
     border: 1px solid ${theme.border};
     border-radius: 6px;
     box-shadow: 0 4px 12px ${theme.shadow};
-    min-width: 120px;
+    min-width: 70px;
     z-index: 1000;
     overflow: hidden;
   `;
@@ -393,8 +434,17 @@ function App() {
           <button css={buttonStyle} onClick={handleEncode}>
             {t.encode}
           </button>
+          <button css={secondaryButtonStyle} onClick={handleBeautify}>
+            {t.beautify}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handleMinify}>
+            {t.minify}
+          </button>
           <button css={secondaryButtonStyle} onClick={handleClear}>
             {t.clear}
+          </button>
+          <button css={secondaryButtonStyle} onClick={handleDownload}>
+            {t.download}
           </button>
           <button css={secondaryButtonStyle} onClick={handleLoadExample}>
             {t.loadExample}
@@ -410,6 +460,24 @@ function App() {
               {useBase62 ? t.base62Encode : t.simpleCompress}
             </label>
           </div>
+          {useBase62 && (
+            <div css={checkboxContainerStyle}>
+              <input
+                type="checkbox"
+                id="customVars"
+                checked={useCustomVars}
+                onChange={(e) => setUseCustomVars(e.target.checked)}
+              />
+              <label htmlFor="customVars">
+                {t.customVars}
+              </label>
+            </div>
+          )}
+          {code.includes('eval(') && (
+            <div css={checkboxContainerStyle}>
+              <span>{t.layersDetected}: {CodeTransformer.detectEvalLayers(code)}</span>
+            </div>
+          )}
         </div>
       </main>
 
