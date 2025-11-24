@@ -1,5 +1,7 @@
 # JS Code Deobfuscator / Obfuscator
 
+<img width="1995" height="1091" alt="image" src="https://github.com/user-attachments/assets/32a9f43e-293b-4b00-9a10-0c0c89277021" />
+
 A modern React TypeScript application for deobfuscating and obfuscating JavaScript code.
 
 ## Features
