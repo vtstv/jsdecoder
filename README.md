@@ -1,6 +1,6 @@
 # JavaScript Code Decoder
 
-A modern React TypeScript application for decoding and encoding JavaScript eval-packed code.
+A modern React TypeScript application for decoding JavaScript eval-packed code.
 
 ## Features
 
