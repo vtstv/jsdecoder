@@ -59,7 +59,7 @@ export interface Translations {
 
 export const translations: Record<Language, Translations> = {
   en: {
-    title: 'JS Code Deobfuscator / Obfuscator',
+    title: 'JS ReverseLab',
     decode: 'Decode',
     encode: 'Encode',
     clear: 'Clear',
@@ -172,7 +172,7 @@ export const translations: Record<Language, Translations> = {
     disclaimer: 'Примечание: Этот инструмент может не расшифровать некоторые многослойные кодировки и методы MurrCoder. Всегда проверяйте функциональность кода перед использованием.',
   },
   de: {
-    title: 'JS Code Deobfuscator / Obfuscator',
+    title: 'JS ReverseLab',
     decode: 'Dekodieren',
     encode: 'Kodieren',
     clear: 'L\u00f6schen',

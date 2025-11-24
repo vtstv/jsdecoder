@@ -1,4 +1,4 @@
-# JS Code Deobfuscator / Obfuscator
+# JS ReverseLab
 
 A powerful React TypeScript application for deobfuscating, obfuscating, and analyzing JavaScript code with advanced security scanning.
 

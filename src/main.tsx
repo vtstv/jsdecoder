@@ -1,5 +1,5 @@
 /**
- * JavaScript Code Transformer
+ * JS ReverseLab
  * © 2025 Murr | https://github.com/vtstv
  */
 
