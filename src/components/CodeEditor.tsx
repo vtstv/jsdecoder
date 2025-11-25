@@ -22,7 +22,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   theme,
   readOnly = false,
   language = 'javascript',
-  placeholder = '',
   height = '400px'
 }) => {
   const handleEditorChange = (value: string | undefined) => {
@@ -35,7 +34,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     <Editor
       height={height}
       defaultLanguage={language}
-      value={value || placeholder}
+      value={value}
       onChange={handleEditorChange}
       theme={editorTheme}
       options={{
