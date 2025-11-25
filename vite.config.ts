@@ -10,7 +10,7 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/jsdecoder/',
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

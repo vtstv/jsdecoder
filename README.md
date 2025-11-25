@@ -2,6 +2,8 @@
 
 A powerful React TypeScript application for deobfuscating, obfuscating, and analyzing JavaScript code with advanced security scanning.
 
+🔗 **Live Demo**: [https://js.murr.li](https://js.murr.li)
+
 <img width="2015" height="1171" alt="image" src="https://github.com/user-attachments/assets/d5647d2c-eac0-45be-a8f9-acae0fda2030" />
 
 ## ✨ Features
