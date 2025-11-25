@@ -296,6 +296,8 @@ function App() {
             theme={theme}
             t={t}
             useMonacoEditor={useMonacoEditor}
+            compareMode={compareMode}
+            splitMode={splitMode}
             copied={copied}
             onToggleMonaco={() => setUseMonacoEditor(!useMonacoEditor)}
             onToggleCompare={toggleCompare}

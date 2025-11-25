@@ -6,6 +6,8 @@ interface ActionButtonsProps {
   theme: Theme;
   t: Translations;
   useMonacoEditor: boolean;
+  compareMode: boolean;
+  splitMode: boolean;
   copied: boolean;
   onToggleMonaco: () => void;
   onToggleCompare: () => void;
@@ -19,6 +21,8 @@ export function ActionButtons({
   theme,
   t,
   useMonacoEditor,
+  compareMode,
+  splitMode,
   copied,
   onToggleMonaco,
   onToggleCompare,
@@ -89,15 +93,46 @@ export function ActionButtons({
     }
   `;
 
+  const createToggleStyle = (isActive: boolean) => css`
+    background: ${isActive ? theme.primary : theme.surface};
+    color: ${isActive ? '#ffffff' : theme.text};
+    border: 2px solid ${isActive ? theme.primary : theme.border};
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background: ${isActive ? theme.primaryHover : theme.border};
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px ${theme.shadow};
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &::before {
+      content: '${isActive ? '✓' : '○'}';
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+  `;
+
   return (
     <div css={css`display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; justify-content: center;`}>
       <button css={toggleButtonStyle} onClick={onToggleMonaco}>
         {t.useMonaco}
       </button>
-      <button css={secondaryButtonStyle} onClick={onToggleCompare}>
+      <button css={createToggleStyle(compareMode)} onClick={onToggleCompare}>
         {t.compareMode}
       </button>
-      <button css={secondaryButtonStyle} onClick={onToggleSplit}>
+      <button css={createToggleStyle(splitMode)} onClick={onToggleSplit}>
         {t.splitMode}
       </button>
       <button css={secondaryButtonStyle} onClick={onPaste}>
