@@ -15,23 +15,15 @@ export class CodeTransformer {
     const cleanCode = evalJsCode.replace(/^eval/, '');
     
     try {
+      // Temporarily override eval to intercept code without executing
       window.eval = function(code: string): any {
         return code;
       };
       
       const result = CodeTransformer.evalHolder.call(window, cleanCode);
       
+      // Restore original eval
       window.eval = CodeTransformer.evalHolder;
-      
-      // If result is a function, try to execute it to get the actual code
-      if (typeof result === 'function') {
-        try {
-          const executed = result();
-          return typeof executed === 'string' ? executed : String(executed);
-        } catch (e) {
-          return result.toString();
-        }
-      }
       
       return typeof result === 'string' ? result : String(result);
     } catch (error) {
@@ -309,9 +301,31 @@ export class CodeTransformer {
         throw new Error('Not valid JSFuck code');
       }
       
-      // Use eval to execute and get result
-      const result = this.evalHolder.call(window, code);
-      return typeof result === 'string' ? result : String(result);
+      // Temporarily override eval to capture the decoded string
+      let capturedResult: any;
+      const originalEval = window.eval;
+      
+      window.eval = function(code: string): any {
+        capturedResult = code;
+        return code;
+      };
+      
+      try {
+        // Execute JSFuck code - it will call eval internally
+        this.evalHolder.call(window, code);
+        
+        // Restore original eval
+        window.eval = originalEval;
+        
+        // Return captured result
+        if (capturedResult !== undefined) {
+          return typeof capturedResult === 'string' ? capturedResult : String(capturedResult);
+        }
+        
+        throw new Error('Failed to decode JSFuck');
+      } finally {
+        window.eval = originalEval;
+      }
     } catch (error) {
       throw new Error(`JSFuck decode failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
